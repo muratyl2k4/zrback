@@ -328,6 +328,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
         # Generate the PDF
         from . import generate_statement
         import time
+        import os
+        from django.conf import settings
         from django.core.files.base import ContentFile
         
         pdf_filename = f"Hesap_Hareketleri_{timezone.now().strftime('%d%m%Y')}.pdf"
