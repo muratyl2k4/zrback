@@ -255,6 +255,9 @@ class TransactionViewSet(viewsets.ModelViewSet):
             "transactions": []
         }
         
+        total_debit = 0.0
+        total_credit = 0.0
+        
         # If there are transactions, calculate the period
         if queryset.exists():
             first_tx = queryset.last() # Because it's descending order, last() is the oldest
@@ -269,6 +272,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
             
             # Reconstruct the exploded transactions
             if tx.is_incoming:
+                total_credit += float(tx.amount)
                 statement_data["transactions"].append({
                     "date": date_str,
                     "receipt_no": tx.receipt_no or "",
@@ -283,6 +287,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 iban = (tx.receiver_iban or '').replace(' ', '')
                 desc = f"{bank_name}/{iban}-{tx.receiver_name or ''}/{tx.transaction_type}".upper() + " işlemi"
                 
+                
+                total_debit += float(tx.amount)
                 # Main
                 statement_data["transactions"].append({
                     "date": date_str,
@@ -299,6 +305,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 cb = current_balance
                 if float(tx.komisyon) > 0:
                     cb += float(tx.komisyon)
+                    total_debit += float(tx.komisyon)
                     statement_data["transactions"].append({
                         "date": date_str,
                         "receipt_no": (tx.receipt_no[:-1] + "1") if tx.receipt_no else "",
@@ -308,6 +315,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                     })
                 if float(tx.bsmv) > 0:
                     cb += float(tx.bsmv)
+                    total_debit += float(tx.bsmv)
                     statement_data["transactions"].append({
                         "date": date_str,
                         "receipt_no": (tx.receipt_no[:-1] + "2") if tx.receipt_no else "",
@@ -317,6 +325,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                     })
                 if float(tx.mesaj_ucreti) > 0:
                     cb += float(tx.mesaj_ucreti)
+                    total_debit += float(tx.mesaj_ucreti)
                     statement_data["transactions"].append({
                         "date": date_str,
                         "receipt_no": (tx.receipt_no[:-1] + "3") if tx.receipt_no else "",
@@ -324,6 +333,11 @@ class TransactionViewSet(viewsets.ModelViewSet):
                         "amount": f"-{tx.mesaj_ucreti:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
                         "balance": f"{cb:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
                     })
+                    
+        statement_data["totals"] = {
+            "debit": f"-{total_debit:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
+            "credit": f"{total_credit:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        }
                     
         # Generate the PDF
         from . import generate_statement

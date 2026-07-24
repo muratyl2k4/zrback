@@ -7,6 +7,7 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = '__all__'
+        read_only_fields = ['user']
 
     def get_is_admin(self, obj):
         return obj.user.is_superuser if obj.user else False
