@@ -11,19 +11,10 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 # 1. Register Turkish TrueType Fonts
 def register_turkish_font():
-    # Candidates for Arial on different platforms
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     font_paths = [
-        # Windows
-        (r"C:\Windows\Fonts\arial.ttf", r"C:\Windows\Fonts\arialbd.ttf"),
-        # macOS
-        ("/Library/Fonts/Arial.ttf", "/Library/Fonts/Arial Bold.ttf"),
-        ("/Library/Fonts/Microsoft/Arial.ttf", "/Library/Fonts/Microsoft/Arial Bold.ttf"),
-        ("/System/Library/Fonts/Supplemental/Arial.ttf", "/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
-        # Linux
-        ("/usr/share/fonts/truetype/msttcorefonts/Arial.ttf", "/usr/share/fonts/truetype/msttcorefonts/Arial_Bold.ttf"),
-        ("/usr/share/fonts/truetype/msttcorefonts/arial.ttf", "/usr/share/fonts/truetype/arialbd.ttf"),
-        ("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
-    ]
+        # Bundle with project
+        (os.path.join(script_dir, "arial.ttf"), os.path.join(script_dir, "arialbd.ttf")),
     
     for normal_path, bold_path in font_paths:
         if os.path.exists(normal_path) and os.path.exists(bold_path):
@@ -68,21 +59,10 @@ def recolor_logo_image(img_path):
     except Exception as e:
         print(f"Error recoloring logo with PIL: {e}")
 
-# 2. Convert WebP logo to PNG using Pillow
 def convert_webp_logo():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    webp_path = os.path.join(script_dir, "assets", "images", "logo.webp")
-    png_path = os.path.join(script_dir, "assets", "images", "logo.png")
-    
-    # Try alternate path if script run from outside root
-    if not os.path.exists(webp_path):
-        webp_path = os.path.abspath("assets/images/logo.webp")
-        png_path = os.path.abspath("assets/images/logo.png")
-        
-    if not os.path.exists(webp_path):
-        # Fallback to absolute project dir
-        webp_path = r"c:\Users\nefise\Desktop\ziraat\assets\images\logo.webp"
-        png_path = r"c:\Users\nefise\Desktop\ziraat\assets\images\logo.png"
+    webp_path = os.path.join(script_dir, "logo.webp")
+    png_path = os.path.join(script_dir, "logo.png")
 
     if os.path.exists(webp_path):
         try:
