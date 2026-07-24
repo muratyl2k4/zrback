@@ -68,12 +68,14 @@ class TransactionViewSet(viewsets.ModelViewSet):
         exploded = []
         for tx in queryset:
             date_str = timezone.localtime(tx.date).strftime("%d.%m.%Y")
+            time_str = timezone.localtime(tx.date).strftime("%H:%M")
             current_balance = float(tx.balance_after)
             if tx.is_incoming:
                 exploded.append({
                     "id": f"inc_{tx.id}",
                     "txId": tx.id,
                     "date": date_str,
+                    "time": time_str,
                     "description": tx.description or 'Gelen Transfer',
                     "amount": float(tx.amount),
                     "color": "#22c55e",
@@ -88,6 +90,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                         "id": f"msg_{tx.id}",
                         "txId": tx.id,
                         "date": date_str,
+                        "time": time_str,
                         "description": "MESAJ ÜCRETİ",
                         "amount": -float(tx.mesaj_ucreti),
                         "color": "var(--text-main)",
@@ -102,6 +105,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                         "id": f"bsmv_{tx.id}",
                         "txId": tx.id,
                         "date": date_str,
+                        "time": time_str,
                         "description": "BSMV TUTARI",
                         "amount": -float(tx.bsmv),
                         "color": "var(--text-main)",
@@ -116,6 +120,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                         "id": f"kom_{tx.id}",
                         "txId": tx.id,
                         "date": date_str,
+                        "time": time_str,
                         "description": "KOMİSYON ÜCRETİ",
                         "amount": -float(tx.komisyon),
                         "color": "var(--text-main)",
@@ -135,6 +140,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                     "id": f"main_{tx.id}",
                     "txId": tx.id,
                     "date": date_str,
+                    "time": time_str,
                     "description": desc,
                     "amount": -float(tx.amount),
                     "color": "var(--text-main)",
