@@ -8,7 +8,7 @@ class Customer(models.Model):
     name = models.CharField(max_length=100)
     address = models.TextField()
     account_number = models.CharField(max_length=20)
-    iban = models.CharField(max_length=30)
+    iban = models.CharField(max_length=100)
     tc = models.CharField(max_length=11, default="11111111111")
     branch = models.CharField(max_length=100, default="0010/İSKENDERUN/HATAY ŞUBESİ")
     balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
