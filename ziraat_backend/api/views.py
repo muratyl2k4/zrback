@@ -326,14 +326,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                     })
                     
         # Generate the PDF
-        import sys
-        import os
-        from django.conf import settings
-        project_root = os.path.abspath(os.path.join(settings.BASE_DIR, '..', '..'))
-        if project_root not in sys.path:
-            sys.path.append(project_root)
-            
-        import generate_statement
+        from . import generate_statement
         import time
         from django.core.files.base import ContentFile
         
