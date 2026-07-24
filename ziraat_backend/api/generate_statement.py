@@ -15,6 +15,7 @@ def register_turkish_font():
     font_paths = [
         # Bundle with project
         (os.path.join(script_dir, "arial.ttf"), os.path.join(script_dir, "arialbd.ttf")),
+    ]
     
     for normal_path, bold_path in font_paths:
         if os.path.exists(normal_path) and os.path.exists(bold_path):
