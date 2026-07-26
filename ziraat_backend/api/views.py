@@ -135,7 +135,12 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 # Remove starting branch codes like "0067-" or "0067 -"
                 bank_name = re.sub(r'^\d+\s*-\s*', '', bank_name).strip()
                 iban = (tx.receiver_iban or '').replace(' ', '')
-                desc = f"{bank_name}/{iban}-{tx.receiver_name or ''}/{tx.transaction_type}".upper() + " işlemi"
+                
+                if tx.transaction_type == 'HAVALE':
+                    desc = f"{tx.receiver_name or ''} Ziraat Mobil Havale".strip()
+                else:
+                    desc = f"{bank_name}/{iban}-{tx.receiver_name or ''}/{tx.transaction_type}".upper() + " işlemi"
+                    
                 exploded.append({
                     "id": f"main_{tx.id}",
                     "txId": tx.id,
@@ -182,7 +187,9 @@ class TransactionViewSet(viewsets.ModelViewSet):
             "gonderen_tc": customer.tc,
             "sube": customer.branch,
             "alici_banka": transaction.receiver_bank,
+            "alici_sube": transaction.receiver_branch,
             "alici_iban": transaction.receiver_iban,
+            "alici_hesap": transaction.receiver_account,
             "alici_isim": transaction.receiver_name,
             "tarih": timezone.localtime(transaction.date).strftime("%d.%m.%Y"),
             "saat": timezone.localtime(transaction.date).strftime("%H:%M:%S"),
@@ -200,7 +207,18 @@ class TransactionViewSet(viewsets.ModelViewSet):
         from django.conf import settings
         from django.template import Template, Context
         
-        template_path = os.path.join(settings.BASE_DIR, '..', '..', 'e-dekont (2).html')
+        if transaction.transaction_type == 'HAVALE':
+            template_name = 'havaledek.html'
+        else:
+            template_name = 'e-dekont (2).html'
+            
+        # Prioritize api/templates directory if it exists, otherwise fallback to base dir
+        template_path_new = os.path.join(settings.BASE_DIR, 'api', 'templates', template_name)
+        if os.path.exists(template_path_new):
+            template_path = template_path_new
+        else:
+            template_path = os.path.join(settings.BASE_DIR, '..', '..', template_name)
+            
         template_path = os.path.abspath(template_path)
         
         with open(template_path, 'r', encoding='utf-8') as f:
@@ -285,7 +303,11 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 bank_name = tx.receiver_bank or ''
                 bank_name = re.sub(r'^\d+\s*-\s*', '', bank_name).strip()
                 iban = (tx.receiver_iban or '').replace(' ', '')
-                desc = f"{bank_name}/{iban}-{tx.receiver_name or ''}/{tx.transaction_type}".upper() + " işlemi"
+                
+                if tx.transaction_type == 'HAVALE':
+                    desc = f"{tx.receiver_name or ''} Ziraat Mobil Havale".strip()
+                else:
+                    desc = f"{bank_name}/{iban}-{tx.receiver_name or ''}/{tx.transaction_type}".upper() + " işlemi"
                 
                 
                 total_debit += float(tx.amount)

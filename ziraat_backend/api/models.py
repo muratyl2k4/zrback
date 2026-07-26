@@ -45,6 +45,8 @@ class Transaction(models.Model):
     
     # Receiver info (Optional for incoming)
     receiver_bank = models.CharField(max_length=100, blank=True, null=True)
+    receiver_branch = models.CharField(max_length=100, blank=True, null=True)
+    receiver_account = models.CharField(max_length=50, blank=True, null=True)
     receiver_iban = models.CharField(max_length=100, blank=True, null=True)
     receiver_name = models.CharField(max_length=100, blank=True, null=True)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES, default='FAST')
