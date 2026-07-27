@@ -311,50 +311,49 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 
                 
                 total_debit += float(tx.amount)
-                # Main
+                cb = current_balance
+
+                if float(tx.mesaj_ucreti) > 0:
+                    total_debit += float(tx.mesaj_ucreti)
+                    statement_data["transactions"].append({
+                        "date": date_str,
+                        "receipt_no": tx.receipt_no or "",
+                        "description": "MESAJ ÜCRETİ",
+                        "amount": f"-{tx.mesaj_ucreti:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
+                        "balance": f"{cb:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                    })
+                    cb += float(tx.mesaj_ucreti)
+
+                if float(tx.bsmv) > 0:
+                    total_debit += float(tx.bsmv)
+                    statement_data["transactions"].append({
+                        "date": date_str,
+                        "receipt_no": tx.receipt_no or "",
+                        "description": "BSMV TUTARI",
+                        "amount": f"-{tx.bsmv:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
+                        "balance": f"{cb:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                    })
+                    cb += float(tx.bsmv)
+
+                if float(tx.komisyon) > 0:
+                    total_debit += float(tx.komisyon)
+                    statement_data["transactions"].append({
+                        "date": date_str,
+                        "receipt_no": tx.receipt_no or "",
+                        "description": "KOMİSYON ÜCRETİ",
+                        "amount": f"-{tx.komisyon:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
+                        "balance": f"{cb:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                    })
+                    cb += float(tx.komisyon)
+
+                # Main Transaction (İŞLEM) at the bottom
                 statement_data["transactions"].append({
                     "date": date_str,
                     "receipt_no": tx.receipt_no or "",
                     "description": desc,
                     "amount": f"-{tx.amount:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
-                    "balance": f"{current_balance:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+                    "balance": f"{cb:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
                 })
-                
-                # Fees (in reverse order to match the list explosion we had, or chronological?)
-                # Actually, in generate_statement_data, we should process fees backwards from current_balance?
-                # The generate_statement.py script takes them exactly as provided.
-                # Let's just explode them.
-                cb = current_balance
-                if float(tx.komisyon) > 0:
-                    cb += float(tx.komisyon)
-                    total_debit += float(tx.komisyon)
-                    statement_data["transactions"].append({
-                        "date": date_str,
-                        "receipt_no": (tx.receipt_no[:-1] + "1") if tx.receipt_no else "",
-                        "description": "KOMİSYON ÜCRETİ",
-                        "amount": f"-{tx.komisyon:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
-                        "balance": f"{cb:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-                    })
-                if float(tx.bsmv) > 0:
-                    cb += float(tx.bsmv)
-                    total_debit += float(tx.bsmv)
-                    statement_data["transactions"].append({
-                        "date": date_str,
-                        "receipt_no": (tx.receipt_no[:-1] + "2") if tx.receipt_no else "",
-                        "description": "BSMV TUTARI",
-                        "amount": f"-{tx.bsmv:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
-                        "balance": f"{cb:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-                    })
-                if float(tx.mesaj_ucreti) > 0:
-                    cb += float(tx.mesaj_ucreti)
-                    total_debit += float(tx.mesaj_ucreti)
-                    statement_data["transactions"].append({
-                        "date": date_str,
-                        "receipt_no": (tx.receipt_no[:-1] + "3") if tx.receipt_no else "",
-                        "description": "MESAJ ÜCRETİ",
-                        "amount": f"-{tx.mesaj_ucreti:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
-                        "balance": f"{cb:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-                    })
                     
         statement_data["totals"] = {
             "debit": f"-{total_debit:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
