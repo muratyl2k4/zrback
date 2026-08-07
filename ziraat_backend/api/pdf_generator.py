@@ -7,11 +7,7 @@ from django.conf import settings
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-# Register font for Turkish character support before generating PDFs
-try:
-    pdfmetrics.registerFont(TTFont('CustomArial', 'C:\\Windows\\Fonts\\arial.ttf'))
-except Exception as e:
-    print("Warning: Could not load Arial font", e)
+
 
 def generate_pdf(data_dict):
     """
