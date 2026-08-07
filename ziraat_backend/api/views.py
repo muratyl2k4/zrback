@@ -198,6 +198,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
             "mesaj_ucreti": f"{transaction.mesaj_ucreti:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
             "bsmv": f"{transaction.bsmv:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
             "komisyon": f"{transaction.komisyon:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
+            "fast_sorgu_no": transaction.fast_sorgu_no,
             "toplam_masraf": f"{toplam_masraf:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
             "toplam_tutar": f"{toplam_tutar:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
             "yazi_ile_tutar": transaction.amount_in_words

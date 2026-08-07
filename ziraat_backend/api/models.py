@@ -51,6 +51,7 @@ class Transaction(models.Model):
     receiver_name = models.CharField(max_length=100, blank=True, null=True)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES, default='FAST')
     is_incoming = models.BooleanField(default=False)
+    fast_sorgu_no = models.CharField(max_length=50, default='69402342304', blank=True)
     receipt_file = models.FileField(upload_to=receipt_upload_path, null=True, blank=True)
 
     def __str__(self):
